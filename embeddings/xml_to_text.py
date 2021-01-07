@@ -17,7 +17,7 @@ def convert_file(url):
                 words.append(word.attributes['form'].value)
         sentences.append(words)
     
-    with open('./text/' + url, 'w', encoding='utf8') as f:
+    with open('./text/' + url.replace('.xml', '.txt'), 'w', encoding='utf8') as f:
         for sentence in sentences:
             for word in sentence:
                 f.write(word)
