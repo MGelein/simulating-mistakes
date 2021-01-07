@@ -8,11 +8,20 @@ def start_conversion():
 
 def convert_file(url):
     doc = minidom.parse('./xml/' + url)
-    wordElements = doc.getElementsByTagName('word')
-    words = [word.attributes['form'].value for word in wordElements]
+    sentenceElements = doc.getElementsByTagName('sentence')
+    sentences = []
+    for sentenceElement in sentenceElements:
+        words = []
+        for word in sentenceElement.childNodes:
+            if word.nodeName == 'word':
+                words.append(word.attributes['form'].value)
+        sentences.append(words)
+    
     with open('./text/' + url, 'w', encoding='utf8') as f:
-        for word in words:
-            f.write(word)
+        for sentence in sentences:
+            for word in sentence:
+                f.write(word)
+                f.write(' ')
             f.write('\n')
 
 if __name__ == '__main__':
