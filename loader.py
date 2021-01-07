@@ -7,5 +7,7 @@ def load_lines(url):
     lines = []
     with open(url, 'r', encoding='utf8') as f:
         for line in f.readlines():
-            lines.append(line.replace('\n', ''))
+            line = line.replace('\r', '').replace('\n', '')
+            if len(line) < 1: continue
+            lines.append(line.split(' '))
     return lines
