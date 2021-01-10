@@ -1,3 +1,4 @@
+print("Handeling imports...")
 from loader import load_embeddings, load_lines
 
 def start_simulation():
@@ -7,4 +8,4 @@ def start_simulation():
     lines = load_lines('./data/hom.il.1.txt')
 
 if __name__ == '__main__':
-    start_simulation()  
+    start_simulation()
