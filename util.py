@@ -16,13 +16,13 @@ def similar_looking_word(word, vocab):
     return choice(options)
     
 def mutate_word(word, line):
-    mutated_index = randint(0, len(word) - 1)
+    mutated_index = randint(0, len(word) - 1) if len(word) > 1 else 0
     new_letter = line[randint(0, len(line) - 1)]
     new_word = word[:mutated_index] + new_letter + word[mutated_index + 1:]
     return new_word.replace(' ', '')
     
 def closest_word(word, embedding):
-    return embedding.most_similar(positive=[word], topn=1)[0]
+    return choice(embedding.most_similar(positive=[word], topn=10))
 
 def levenshtein(word_a, word_b):
     global matrix

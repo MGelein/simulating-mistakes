@@ -8,13 +8,7 @@ from configparser import ConfigParser
 def show_help():
     print("""
     Welcome to the text transmission simulation tool, you can use the following arguments:
-    --settings      -s      .ini settings file, if this is provided no other options are necessary, otherwise use the command line options
-    --input         -i      [OPTIONAL] the input file, f.e. "file.txt"
-    --output        -o      [OPTIONAL] the output director, this is where the output of the algorithm is saved
-    --embeddings    -e      [OPTIONAL] the embeddings file, this is the word embeddings used to 
-    --population    -p      [OPTIONAL], population size, defaults to 5
-    --generations   -g      [OPTIONAL], amount of generations the agents get to give the text between eachother, defaults to 10
-    --edit-fn       -f      [OPTIONAL], 'modified-hamming' or 'levenshtein', to set the edit distance comparison function used, default is 'modified hamming'
+    --settings      -s      .ini settings file location
     """)
     exit()
 
@@ -27,40 +21,26 @@ def load_lines(url):
             lines.append(line.split(' '))
     return lines
 
-def parse_ini(url, params):
+def parse_ini(url):
     config = ConfigParser()
     config.read(url)
+    params = {}
     params['embeddings'] = config.get('simulation', 'embeddings')
     params['input'] = config.get('simulation', 'input')
     params['output'] = config.get('simulation', 'output_dir')
-    params['population_size'] = config.get('simulation', 'population_size')
-    params['generations'] = config.get('simulation', 'generations')
+    params['population_size'] = config.getint('simulation', 'population_size')
+    params['generations'] = config.getint('simulation', 'generations')
+    params['edit_function'] = config.get('simulation', 'edit_function')
     return params
 
 def parse_params():
-    params = {'population_size': 5, 'generations': 10, 'edit_function': 'modified-hamming'}
     for i in range(len(sys.argv)):
         arg = sys.argv[i]
         if i + 1 < len(sys.argv): next_arg = sys.argv[i + 1]
         else: next_arg = None
 
-        if arg in ('--input', '-i'):
-            params['input'] = next_arg
-        elif arg in ('--output-dir', '-o'):
-            params['output'] = next_arg
-        elif arg in ('--embeddings', '-e'):
-            params['embeddings'] = next_arg
-        elif arg in ('--population', '-p'):
-            params['population_size'] = int(next_arg)
-        elif arg in ('--generations', '-g'):
-            params['generations'] = int(next_arg)
-        elif arg in ('--edit-fn', '-f'):
-            params['edit_function'] = next_arg
-        elif arg in ('--settings', '-s'):
-            params = parse_ini(next_arg, params)
-            break
-
-    return params
+        if arg in ('--settings', '-s'):
+            return parse_ini(next_arg)
 
 def start_simulation(params):
     print("Loading embeddings from: %s" % params['embeddings'])
@@ -79,5 +59,6 @@ if __name__ == '__main__':
         show_help()
     else:
         params = parse_params()
+    if params is None: show_help()
 
     start_simulation(params)

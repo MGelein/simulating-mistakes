@@ -1,2 +1,2 @@
 #!/bin/bash
-python main.py --setings settings.ini
+python main.py --settings settings.ini
