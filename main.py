@@ -2,6 +2,7 @@ print("Handeling imports...")
 import sys
 from gensim.models import KeyedVectors
 from simulation import Simulation
+from util import similar_looking_word, set_edit_dist_function
 
 def show_help():
     print("""
@@ -11,6 +12,7 @@ def show_help():
     --embeddings    -e      the embeddings file, this is the word embeddings used to 
     --population    -p      [OPTIONAL], population size, defaults to 5
     --generations   -g      [OPTIONAL], amount of generations the agents get to give the text between eachother, defaults to 10
+    --edit-fn       -f      [OPTIONAL], 'modified-hamming' or 'levenshtein', to set the edit distance comparison function used, default is 'modified hamming'
     """)
     exit()
 
@@ -24,7 +26,7 @@ def load_lines(url):
     return lines
 
 def parse_params():
-    params = {'population_size': 5, 'generations': 10}
+    params = {'population_size': 5, 'generations': 10, 'edit_function': 'modified-hamming'}
     for i in range(len(sys.argv)):
         arg = sys.argv[i]
         if i + 1 < len(sys.argv): next_arg = sys.argv[i + 1]
@@ -40,6 +42,8 @@ def parse_params():
             params['population_size'] = int(next_arg)
         elif arg in ('--generations', '-g'):
             params['generations'] = int(next_arg)
+        elif arg in ('--edit-fn', '-f'):
+            params['edit_function'] = next_arg
 
     return params
 
@@ -48,6 +52,7 @@ def start_simulation(params):
     embeddings = KeyedVectors.load(params['embeddings'])
     print("Loading text from: %s" % params['input'])
     lines = load_lines(params['input'])
+    set_edit_dist_function(params['edit_function'])
 
     simulation = Simulation(lines, embeddings, params)
     simulation.run(params['generations'])
