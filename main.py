@@ -7,7 +7,7 @@ def show_help():
     print("""
     Welcome to the text transmission simulation tool, you can use the following arguments:
     --input         -i      the input file, f.e. "file.txt"
-    --output        -o      the output file, this is where the output of the algorithm is saved
+    --output        -o      the output director, this is where the output of the algorithm is saved
     --embeddings    -e      the embeddings file, this is the word embeddings used to 
     --population    -p      [OPTIONAL], population size, defaults to 100
     --generations   -g      [OPTIONAL], amount of generations the agents get to give the text between eachother, defaults to 100
@@ -32,7 +32,7 @@ def parse_params():
 
         if arg in ('--input', '-i'):
             params['input'] = next_arg
-        elif arg in ('--output', '-o'):
+        elif arg in ('--output-dir', '-o'):
             params['output'] = next_arg
         elif arg in ('--embeddings', '-e'):
             params['embeddings'] = next_arg
