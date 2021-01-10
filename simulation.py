@@ -1,5 +1,5 @@
 from agent import Agent
-from random import choice
+from random import choice, shuffle
 from tqdm import tqdm
 
 class Simulation:
@@ -15,17 +15,20 @@ class Simulation:
 
     def single_generation(self):
         available_agents = self.population[:]
+        shuffle(self.population)
         for agent in self.population:
-            available_agents.remove(agent)
             if agent in available_agents:
-                written_text = agent.write()
+                available_agents.remove(agent)
+                if len(available_agents) < 1: break
                 reader_agent = choice(available_agents)
-                reader_agent.read(written_text)
                 available_agents.remove(reader_agent)
+                
+                written_text = agent.write()
+                reader_agent.read(written_text)
 
     def save_result(self, url):
         for agent_num in range(len(self.population)):
             agent = self.population[agent_num]   
             with open(url + "/agent_%d.txt" % agent_num, 'w', encoding='utf8') as f:
-                lines  = [" ".join(line) for line in self.text]
+                lines  = [" ".join(line) for line in agent.text]
                 f.write("\n".join(lines))
