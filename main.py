@@ -3,13 +3,15 @@ import sys
 from gensim.models import KeyedVectors
 from simulation import Simulation
 from util import similar_looking_word, set_edit_dist_function
+from configparser import ConfigParser
 
 def show_help():
     print("""
     Welcome to the text transmission simulation tool, you can use the following arguments:
-    --input         -i      the input file, f.e. "file.txt"
-    --output        -o      the output director, this is where the output of the algorithm is saved
-    --embeddings    -e      the embeddings file, this is the word embeddings used to 
+    --settings      -s      .ini settings file, if this is provided no other options are necessary, otherwise use the command line options
+    --input         -i      [OPTIONAL] the input file, f.e. "file.txt"
+    --output        -o      [OPTIONAL] the output director, this is where the output of the algorithm is saved
+    --embeddings    -e      [OPTIONAL] the embeddings file, this is the word embeddings used to 
     --population    -p      [OPTIONAL], population size, defaults to 5
     --generations   -g      [OPTIONAL], amount of generations the agents get to give the text between eachother, defaults to 10
     --edit-fn       -f      [OPTIONAL], 'modified-hamming' or 'levenshtein', to set the edit distance comparison function used, default is 'modified hamming'
@@ -24,6 +26,16 @@ def load_lines(url):
             if len(line) < 1: continue
             lines.append(line.split(' '))
     return lines
+
+def parse_ini(url, params):
+    config = ConfigParser()
+    config.read(url)
+    params['embeddings'] = config.get('simulation', 'embeddings')
+    params['input'] = config.get('simulation', 'input')
+    params['output'] = config.get('simulation', 'output_dir')
+    params['population_size'] = config.get('simulation', 'population_size')
+    params['generations'] = config.get('simulation', 'generations')
+    return params
 
 def parse_params():
     params = {'population_size': 5, 'generations': 10, 'edit_function': 'modified-hamming'}
@@ -44,6 +56,9 @@ def parse_params():
             params['generations'] = int(next_arg)
         elif arg in ('--edit-fn', '-f'):
             params['edit_function'] = next_arg
+        elif arg in ('--settings', '-s'):
+            params = parse_ini(next_arg, params)
+            break
 
     return params
 
