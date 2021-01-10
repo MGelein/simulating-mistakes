@@ -9,8 +9,8 @@ def show_help():
     --input         -i      the input file, f.e. "file.txt"
     --output        -o      the output file, this is where the output of the algorithm is saved
     --embeddings    -e      the embeddings file, this is the word embeddings used to 
-    --population    -p      [OPTIONAL], population size, defaults to 10
-    --generations   -g      [OPTIONAL], amount of generations the agents get to give the text between eachother, defaults to 10
+    --population    -p      [OPTIONAL], population size, defaults to 100
+    --generations   -g      [OPTIONAL], amount of generations the agents get to give the text between eachother, defaults to 100
     """)
     exit()
 
@@ -24,7 +24,7 @@ def load_lines(url):
     return lines
 
 def parse_params():
-    params = {'population_size': 10, 'generations': 10}
+    params = {'population_size': 100, 'generations': 100}
     for i in range(len(sys.argv)):
         arg = sys.argv[i]
         if i + 1 < len(sys.argv): next_arg = sys.argv[i + 1]
@@ -51,6 +51,7 @@ def start_simulation(params):
 
     simulation = Simulation(lines, embeddings, params)
     simulation.run(params['generations'])
+    simulation.save_result(params['output'])
 
 if __name__ == '__main__':
 

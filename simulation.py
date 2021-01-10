@@ -23,3 +23,7 @@ class Simulation:
                 reader_agent.read(written_text)
                 available_agents.remove(reader_agent)
 
+    def save_result(self, url):
+        with open(url, 'w', encoding='utf8') as f:
+            lines  = [" ".join(line) for line in self.text]
+            f.write("\n".join(lines))
