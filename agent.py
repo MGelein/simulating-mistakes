@@ -6,6 +6,10 @@ class Agent:
     def __init__(self, simulation):
         self.simulation = simulation
         self.text = simulation.text[:]
+        self.memory = simulation.sample_memory()
+        self.arrogance = simulation.sample_arrogance()
+        self.influence = simulation.sample_influence()
+        self.vocabulary = simulation.sample_vocabulary()
 
     def read_word(self, word, line):
         mutated_word = mutate_word(word, line)

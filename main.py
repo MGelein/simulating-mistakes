@@ -6,10 +6,8 @@ from util import set_edit_dist_function
 from iniparser import parse_params
 
 def show_help():
-    print("""
-    Welcome to the text transmission simulation tool, you can use the following arguments:
-    --settings      -s      .ini settings file location
-    """)
+    print("""Welcome to the text transmission simulation tool, you can use the following arguments:
+    --settings      -s      .ini settings file location""")
     exit()
 
 def load_lines(url):
