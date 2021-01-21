@@ -1,5 +1,5 @@
 from agent import Agent
-from random import choice, shuffle, random
+from random import choice, random
 from tqdm import tqdm
 
 class Simulation:
@@ -14,17 +14,11 @@ class Simulation:
         for _ in tqdm(range(num_generations), desc="Generations"): self.single_generation()
 
     def single_generation(self):
-        available_agents = self.population[:]
-        shuffle(self.population)
+        # For each agent, we choose a source manuscript, read it, and then write our own copy
         for agent in self.population:
-            if agent in available_agents:
-                available_agents.remove(agent)
-                if len(available_agents) < 1: break
-                reader_agent = choice(available_agents)
-                available_agents.remove(reader_agent)
-                
-                written_text = agent.write()
-                reader_agent.read(written_text)
+            chosen_source = choice(self.population)
+            agent.read(chosen_source.text)
+            agent.write()
 
     def save_result(self, url):
         for agent_num in range(len(self.population)):
