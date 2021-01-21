@@ -6,6 +6,7 @@ class Agent:
     def __init__(self, simulation):
         self.simulation = simulation
         self.canonical_text = simulation.text[:]
+        self.written_text = self.canonical_text[:]
         self.remembered_text = self.canonical_text[:]
         self.memory = simulation.sample_memory()
         self.arrogance = simulation.sample_arrogance()
@@ -18,6 +19,9 @@ class Agent:
         if random() < .01: 
             return similar_looking_word(word, self.simulation.embeddings.vocab)
         return word
+
+    def make_canonical(self):
+        self.canonical_text = self.written_text
 
     def write_word(self, word):
         if word not in self.simulation.embeddings: return word
@@ -35,11 +39,11 @@ class Agent:
         self.remembered_text = read_text
 
     def write(self):
-        written_text = []
+        write_text = []
         for line in self.remembered_text:
             written_line = []
             for word in line:
                 written_line.append(self.write_word(word))
-            written_text.append(written_line)
-        self.canonical_text = written_text
+            write_text.append(written_line)
+        self.written_text = write_text
 

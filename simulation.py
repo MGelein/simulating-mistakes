@@ -1,6 +1,9 @@
 from agent import Agent
 from random import choice, random
 from tqdm import tqdm
+from concurrent.futures import ThreadPoolExecutor
+from os import cpu_count
+
 
 class Simulation:
 
@@ -15,10 +18,14 @@ class Simulation:
 
     def single_generation(self):
         # For each agent, we choose a source manuscript, read it, and then write our own copy
-        for agent in self.population:
-            chosen_source = choice(self.population)
-            agent.read(chosen_source)
-            agent.write()
+        with ThreadPoolExecutor(max_workers = cpu_count()) as executor:
+            results = executor.map(self.simulate_agent, range(len(self.population)))
+
+    def simulate_agent(self, index):
+        agent = self.population[index]
+        chosen_source = choice(self.population)
+        agent.read(chosen_source)
+        agent.write()
 
     def save_result(self, url):
         for agent_num in range(len(self.population)):
