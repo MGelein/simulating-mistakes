@@ -8,7 +8,7 @@ class Simulation:
         self.text = text
         self.embeddings = embeddings
         self.params = params
-        self.population = [Agent(self) for _ in range(params['population_size'])]
+        self.population = [Agent(self) for _ in range(params.population_size)]
 
     def run(self, num_generations):
         for _ in tqdm(range(num_generations), desc="Generations"): self.single_generation()
