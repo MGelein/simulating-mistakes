@@ -17,7 +17,7 @@ class Simulation:
         # For each agent, we choose a source manuscript, read it, and then write our own copy
         for agent in self.population:
             chosen_source = choice(self.population)
-            agent.read(chosen_source.text)
+            agent.read(chosen_source)
             agent.write()
 
     def save_result(self, url):

@@ -5,7 +5,8 @@ class Agent:
     
     def __init__(self, simulation):
         self.simulation = simulation
-        self.text = simulation.text[:]
+        self.canonical_text = simulation.text[:]
+        self.remembered_text = self.canonical_text[:]
         self.memory = simulation.sample_memory()
         self.arrogance = simulation.sample_arrogance()
         self.influence = simulation.sample_influence()
@@ -23,22 +24,22 @@ class Agent:
         similar_word, similarity = closest_word(word, self.simulation.embeddings)
         return similar_word if similarity > 0.9 else word
 
-    def read(self, text):
+    def read(self, agent):
         read_text = []
-        for line in text:
+        for line in agent.canonical_text:
             read_line = []
             joined_line = " ".join(line)
             for word in line:
                 read_line.append(self.read_word(word, joined_line))
             read_text.append(read_line)
-        self.text = read_text
+        self.remembered_text = read_text
 
     def write(self):
         written_text = []
-        for line in self.text:
+        for line in self.remembered_text:
             written_line = []
             for word in line:
                 written_line.append(self.write_word(word))
             written_text.append(written_line)
-        return written_text
+        self.canonical_text = written_text
 
