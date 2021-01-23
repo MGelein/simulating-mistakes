@@ -17,11 +17,13 @@ class Simulation:
         for _ in tqdm(range(num_generations), desc="Generations"): self.single_generation()
 
     def single_generation(self):
-        # For each agent, we choose a source manuscript, read it, and then write our own copy
+        # We map every agent's loop to a single thread, this makes the simulation a LOT faster
         with ThreadPoolExecutor(max_workers = cpu_count()) as executor:
             results = executor.map(self.simulate_agent, range(len(self.population)))
+        for agent in self.population: agent.make_canonical()
 
     def simulate_agent(self, index):
+        # For each agent, we choose a source manuscript, read it, and then write our own copy
         agent = self.population[index]
         chosen_source = choice(self.population)
         agent.read(chosen_source)
@@ -31,7 +33,7 @@ class Simulation:
         for agent_num in range(len(self.population)):
             agent = self.population[agent_num]   
             with open(url + "/agent_%d.txt" % agent_num, 'w', encoding='utf8') as f:
-                lines  = [" ".join(line) for line in agent.text]
+                lines  = [" ".join(line) for line in agent.canonical_text]
                 f.write("\n".join(lines))
 
     def sample_range(self, number_range):
