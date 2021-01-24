@@ -1,5 +1,5 @@
 print("Handeling imports...")
-import sys
+import sys, os
 from gensim.models import KeyedVectors
 from simulation import Simulation
 from util import set_edit_dist_function
@@ -25,6 +25,8 @@ def start_simulation(params):
     print("Loading text from: %s" % params.input)
     lines = load_lines(params.input)
     set_edit_dist_function(params.edit_function)
+
+    if not os.path.isdir(params.output): os.mkdir(params.output)
 
     simulation = Simulation(lines, embeddings, params)
     simulation.run(params.iterations)
