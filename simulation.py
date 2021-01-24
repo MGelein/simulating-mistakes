@@ -11,7 +11,7 @@ class Simulation:
         self.text = text
         self.embeddings = embeddings
         self.params = params
-        self.population = [Agent(self) for _ in range(params.population_size)]
+        self.population = [Agent(self, i) for i in range(params.population_size)]
 
     def run(self, num_generations):
         for _ in tqdm(range(num_generations), desc="Generations"): self.single_generation()
@@ -26,9 +26,20 @@ class Simulation:
     def simulate_agent(self, index):
         # For each agent, we choose a source manuscript, read it, and then write our own copy
         agent = self.population[index]
-        chosen_source = choice(self.population)
+        chosen_source = self.choose_source(agent)
         agent.read(chosen_source)
         agent.write()
+
+    def choose_source(self, agent):
+        possible_sources = []
+        for source in self.population:
+            diff = abs(source.position - agent.position)
+            influence = source.influence * self.params.simulation_space
+            if influence > diff: possible_sources.append(source)
+        srt = sorted(possible_sources, key=lambda x: x.influence)
+        print('--')
+        for s in srt: print(s.influence)
+        return srt[0]
 
     def save_result(self, url):
         for agent_num in range(len(self.population)):
@@ -36,6 +47,11 @@ class Simulation:
             with open(url + "/agent_%d.txt" % agent_num, 'w', encoding='utf8') as f:
                 lines  = [" ".join(line) for line in agent.canonical_text]
                 f.write("\n".join(lines))
+
+    def sample_position(self, number):
+        rnd_value = self.sample_range((0, self.params.simulation_space))
+        div_value = (self.params.simulation_space / self.params.population_size) * number
+        return rnd_value * self.params.dist_randomness + div_value * (1 - self.params.dist_randomness)
 
     def sample_range(self, number_range):
         return random() * (number_range[1] - number_range[0]) + number_range[0]

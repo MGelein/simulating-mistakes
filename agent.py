@@ -3,7 +3,7 @@ from util import similar_looking_word, closest_word
 
 class Agent:
     
-    def __init__(self, simulation):
+    def __init__(self, simulation, number):
         self.simulation = simulation
         self.canonical_text = simulation.text[:]
         self.written_text = self.canonical_text[:]
@@ -12,6 +12,7 @@ class Agent:
         self.arrogance = simulation.sample_arrogance()
         self.influence = simulation.sample_influence()
         self.vocabulary = simulation.sample_vocabulary()
+        self.position = simulation.sample_position(number)
         self.known_words = {}
 
     def in_vocab(self, word):
