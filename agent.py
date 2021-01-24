@@ -1,5 +1,5 @@
-from random import choice, random
-from util import similar_looking_word
+from random import choice, random, randint
+from util import similar_looking_word, closest_word
 
 class Agent:
     
@@ -12,50 +12,76 @@ class Agent:
         self.arrogance = simulation.sample_arrogance()
         self.influence = simulation.sample_influence()
         self.vocabulary = simulation.sample_vocabulary()
+        self.known_words = {}
+
+    def in_vocab(self, word):
+        if word in self.known_words: return self.known_words[word]
+        known = random() < self.vocabulary
+        self.known_words[word] = known
+        return known
     
     def skip_line(self, sentences):
         sentence, next_sentence = sentences
-        if random.random() < self.arrogance: 
+        if random() < self.arrogance: 
             return [next_sentence]
         
         for word in next_sentence:
             if word in sentence:
                 start = sentence.index(word)
                 end = next_sentence.index(word)
-                return sentence[:start] + next_sentence[end:]
+                return [sentence[:start] + next_sentence[end:]]
+
+        return sentences
 
     def substitute_word(self, word):
-        if random.random() > self.arrogance and word in self.vocab: 
+        if random() > self.arrogance and self.in_vocab(word):
             return word
-        top_ten = self.embeddings.most_similar(positive=[word], topn=10)
-        return random.choice(top_ten)
+        try:
+            top_ten = self.simulation.embeddings.most_similar(positive=[word], topn=10)
+        except:
+            return word
+        return choice(top_ten)[0]
 
     def mutate_letter(self, word, alphabet):
-        rnd_index = random.randint(0, len(word) - 1)
-        letter = random.choice(alphabet)
+        rnd_index = randint(0, len(word) - 1) if len(word) > 1 else 0
+        letter = choice(alphabet)
         new_word = word[:rnd_index] + letter + word[rnd_index + 1:]
-        if new_word in self.vocab: 
+        if self.in_vocab(new_word):
             return new_word
         else:
-            return new_word if random.random() < self.arrogance else word
+            return new_word if random() < self.arrogance else word
 
     def read_word(self, word, line):
-        
+        if random() > self.memory:
+            return self.mutate_letter(word, line)
         return word
 
     def make_canonical(self):
         self.canonical_text = self.written_text
 
     def write_word(self, word):
-        if word not in self.simulation.embeddings: return word
-        similar_word, similarity = closest_word(word, self.simulation.embeddings)
-        return similar_word if similarity > 0.9 else word
+        if self.in_vocab(word): 
+            return self.substitute_word(word)
+        else:
+            return word
+            # return similar_looking_word(word, self.simulation.embeddings.vocab)
 
     def read(self, agent):
         read_text = []
-        for line in agent.canonical_text:
+        skipped_text = []
+
+        i = 0
+        while i < len(agent.canonical_text) - 1:
+            line = agent.canonical_text[i]
+            next_line = agent.canonical_text[i + 1]
+            after_skip_lines = self.skip_line([line, next_line]) if random() > self.memory else [line, next_line]
+            
+            for l in after_skip_lines: skipped_text.append(l)
+            i += 2
+
+        for line in skipped_text:
             read_line = []
-            joined_line = " ".join(line)
+            joined_line = "".join(line).replace("·", '').replace('\'', '').replace('.', '')
             for word in line:
                 read_line.append(self.read_word(word, joined_line))
             read_text.append(read_line)
