@@ -81,5 +81,5 @@ if __name__ == '__main__':
         for value in cossims: f.write('%f, ' % value)
         f.write('\n')
         f.write('mean: %f\n' % mean)
-        f.write('range: %f to %f\n' % (minimum, maximum))
+        f.write('range: %f to %f' % (minimum, maximum))
     print('Analysis of %s directory saved to %s' % (params.input, params.input + "/results.txt"))
