@@ -26,7 +26,7 @@ def start_simulation(params):
     lines = load_lines(params.input)
     set_edit_dist_function(params.edit_function)
 
-    if not os.path.isdir(params.output): os.mkdir(params.output)
+    if not os.path.isdir(params.output): os.makedirs(params.output)
 
     simulation = Simulation(lines, embeddings, params)
     simulation.run(params.iterations)
