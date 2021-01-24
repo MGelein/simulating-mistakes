@@ -36,10 +36,7 @@ class Simulation:
             diff = abs(source.position - agent.position)
             influence = source.influence * self.params.simulation_space
             if influence > diff: possible_sources.append(source)
-        srt = sorted(possible_sources, key=lambda x: x.influence)
-        print('--')
-        for s in srt: print(s.influence)
-        return srt[0]
+        return sorted(possible_sources, key=lambda x: x.influence, reverse=True)[0]
 
     def save_result(self, url):
         for agent_num in range(len(self.population)):
