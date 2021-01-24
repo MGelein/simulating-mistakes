@@ -1,5 +1,5 @@
 from random import choice, random
-from util import similar_looking_word, mutate_word, closest_word
+from util import similar_looking_word
 
 class Agent:
     
@@ -12,12 +12,35 @@ class Agent:
         self.arrogance = simulation.sample_arrogance()
         self.influence = simulation.sample_influence()
         self.vocabulary = simulation.sample_vocabulary()
+    
+    def skip_line(self, sentences):
+        sentence, next_sentence = sentences
+        if random.random() < self.arrogance: 
+            return [next_sentence]
+        
+        for word in next_sentence:
+            if word in sentence:
+                start = sentence.index(word)
+                end = next_sentence.index(word)
+                return sentence[:start] + next_sentence[end:]
+
+    def substitute_word(self, word):
+        if random.random() > self.arrogance and word in self.vocab: 
+            return word
+        top_ten = self.embeddings.most_similar(positive=[word], topn=10)
+        return random.choice(top_ten)
+
+    def mutate_letter(self, word, alphabet):
+        rnd_index = random.randint(0, len(word) - 1)
+        letter = random.choice(alphabet)
+        new_word = word[:rnd_index] + letter + word[rnd_index + 1:]
+        if new_word in self.vocab: 
+            return new_word
+        else:
+            return new_word if random.random() < self.arrogance else word
 
     def read_word(self, word, line):
-        mutated_word = mutate_word(word, line)
-        if mutated_word in self.simulation.embeddings: return mutated_word
-        if random() < .01: 
-            return similar_looking_word(word, self.simulation.embeddings.vocab)
+        
         return word
 
     def make_canonical(self):
