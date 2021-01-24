@@ -17,9 +17,6 @@ class Simulation:
         for _ in tqdm(range(num_generations), desc="Generations"): self.single_generation()
 
     def single_generation(self):
-        # We map every agent's loop to a single thread, this makes the simulation a LOT faster
-        # with ThreadPoolExecutor(max_workers = cpu_count()) as executor:
-        #     results = executor.map(self.simulate_agent, range(len(self.population)))
         for i, agent in enumerate(self.population): self.simulate_agent(i)
         for agent in self.population: agent.make_canonical()
 
