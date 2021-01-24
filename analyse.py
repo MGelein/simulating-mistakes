@@ -2,6 +2,19 @@ import numpy as np
 from tqdm import tqdm
 from numpy import dot
 from numpy.linalg import norm
+import sys
+from types import SimpleNamespace
+from itertools import permutations
+
+def parse_params():
+    params = {'input': '.', 'number': 5}
+    for i, arg in enumerate(sys.argv):
+        if arg in ['-i', '--input']:
+            params['input'] = sys.argv[i + 1]
+        elif arg in ['-n', '--number-of-agents']:
+            params['number'] = int(sys.argv[i + 1])
+
+    return SimpleNamespace(**params)
 
 def term_frequency(texts):
     words_collection = []
@@ -47,9 +60,26 @@ def load_textfile(url):
         pass
     return " ".join(lines)
 
-files = []
-for i in range(5):
-    files.append(load_textfile('agent_%d' % i))
-tfs = term_frequency(files)
+if __name__ == '__main__':
+    params = parse_params()
+    files = []
+    print("Analysing %d files in directory: %s" % (params.number, params.input))
+    for i in range(params.number):
+        files.append(load_textfile(params.input + '/agent_%d' % i))
+    tfs = term_frequency(files)
 
-print(cosine_similarity(tfs[0], tfs[1]))
+    cossims = []
+    for tf_a, tf_b in permutations(tfs, 2):
+        cossims.append((cosine_similarity(tf_a, tf_b)))
+
+    mean = sum(cossims) / len(cossims)
+    minimum = min(cossims)
+    maximum = max(cossims)
+
+    with open(params.input + "/results.txt", 'w') as f:
+        f.write('values: ')
+        for value in cossims: f.write('%f, ' % value)
+        f.write('\n')
+        f.write('mean: %f\n' % mean)
+        f.write('range: %f to %f\n' % (minimum, maximum))
+    print('Analysis of %s directory saved to %s' % (params.input, params.input + "/results.txt"))
