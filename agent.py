@@ -63,8 +63,10 @@ class Agent:
         if self.in_vocab(word): 
             return self.substitute_word(word)
         else:
-            return word
-            # return similar_looking_word(word, self.simulation.embeddings.vocab)
+            if random() > self.memory:
+                return similar_looking_word(word, self.simulation.embeddings.vocab)
+            else: 
+                return word
 
     def read(self, agent):
         read_text = []
